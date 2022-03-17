@@ -1,0 +1,70 @@
+version: '3'
+
+networks:
+    sample-network:
+        driver: bridge
+
+services:
+    db:
+        build:
+            context: .
+            dockerfile: ./db.dockerfile
+        container_name: db
+        volumes:
+            - "./docker-volumes/postgres:/var/lib/postgresql/data:delegated"
+        expose:
+            - "5432"
+        ports:
+            - "5432:5432"
+        environment:
+            PGUSER: postgres
+            POSTGRES_PASSWORD: password
+        networks:
+            - sample-network
+
+    pg:
+        build:
+            context: .
+            dockerfile: ./db.dockerfile
+        container_name: db-client
+        volumes:
+            - "./scripts:/scripts"
+            - "./csv:/csv"
+        entrypoint: "psql -h db"
+        depends_on:
+            - db
+        environment:
+            PGUSER: postgres
+            PGPASSWORD: password
+        networks:
+            - sample-network
+
+    api-rust:
+        build:
+            context: .
+            dockerfile: ./rust.dockerfile
+        container_name: api-rust
+        volumes:
+            - "../../api-rust:/app"
+        ports:
+            - "8080:8080"
+        working_dir: "/app"
+        entrypoint: "cargo watch -x run"
+        depends_on:
+            - db
+        networks:
+            - sample-network
+
+    api-rust-cmd:
+        build:
+            context: .
+            dockerfile: ./rust.dockerfile
+        container_name: api-rust-cmd
+        volumes:
+            - "../../api-rust:/app"
+        working_dir: "/app"
+        command: "/bin/bash"
+        depends_on:
+            - db
+        networks:
+            - sample-network

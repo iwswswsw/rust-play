@@ -1,0 +1,5 @@
+# for Git-Bash
+# export COMPOSE_FILE=`pwd`/docker/dev/docker-compose.yml
+
+# for Linux
+export COMPOSE_FILE=$(pwd)/docker/dev/docker-compose.yml
