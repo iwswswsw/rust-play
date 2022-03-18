@@ -55,9 +55,9 @@ async fn get_monthly_counts(year: web::Path<i32>) -> impl Responder {
     println!("Displaying {} pcr_count", results.len());
     // println!("{:?}", results);
     
-    // TODO: 月ごとにcountを集計して返す
+    // 月ごとにcountを集計して返す
     let mut monthly_counts: Vec<MonthlyCount> = Vec::with_capacity(MONTHS);
-    for m in 1..MONTHS {
+    for m in 1..MONTHS+1 {
         let m_u32: u32 = m as u32;
         let count = results.iter().filter(|r| r.date.month()==m_u32).map(|r| r.count).collect::<Vec<i32>>().iter().sum();
         monthly_counts.push(MonthlyCount { month: m, count: count });
